@@ -5,6 +5,7 @@ import connectDB from "./config/db.js";
 import authRoute from "./routes/authRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
+import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -20,6 +21,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(morgan("dev"));
+app.use(cors());
 
 // Serve static files from the build directory
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
