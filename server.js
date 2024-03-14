@@ -1,50 +1,42 @@
 import express from "express";
 import env from "dotenv";
-import colors from "colors";
 import morgan from "morgan";
 import connectDB from "./config/db.js";
 import authRoute from "./routes/authRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
-import multer from "multer";
-import { v2 as cloudinary } from "cloudinary";
-import cors from "cors";
-import path from "path"; // Removed unnecessary imports
+import path from "path";
 import { fileURLToPath } from "url";
-import { dirname } from "path";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// configure env
+// Configure env
 env.config();
 
-// database connection
+// Database connection
 connectDB();
 
-// rest object
+// Create Express app
 const app = express();
 
-app.use(cors());
-
-// middleware
+// Middleware
 app.use(express.json());
 app.use(morgan("dev"));
 
-// Serve static files
-app.use(express.static(path.join(__dirname, "ecom", "build")));
+// Serve static files from the build directory
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+app.use(express.static(path.join(__dirname, "ecom/build")));
 
-// Define API routes
+// Define routes
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/product", productRoutes);
 
-// Catch-all route to serve index.html for SPA
+// For any other route, serve the index.html file
 app.get("*", function (req, res) {
-  res.sendFile(path.join(__dirname, "ecom", "build", "index.html"));
+  res.sendFile(path.join(__dirname, "ecom/build/index.html"));
 });
 
-const port = process.env.PORT || 8080;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`.bgCyan.white);
+// Start the server
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
