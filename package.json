@@ -9,7 +9,7 @@
     "start": "node server.js",
     "server": "nodemon server.js",
     "ecom": "npm start --prefix ../ecom",
-    "dev": "concurrently \"npm run ecom\" \"npm run server\""
+    "dev": "concurrently \"npm run ecom\" \"npm run start\""
   },
   "author": "",
   "license": "ISC",
