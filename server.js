@@ -1,42 +1,54 @@
 import express from "express";
 import env from "dotenv";
+import colors from "colors";
 import morgan from "morgan";
 import connectDB from "./config/db.js";
 import authRoute from "./routes/authRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
+import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
+import cors from "cors";
+import fs from "fs";
 import path from "path";
+import { dirname } from "path";
 import { fileURLToPath } from "url";
 
-// Configure env
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// configure env
 env.config();
 
-// Database connection
+// database connection
 connectDB();
 
-// Create Express app
+// rest object
 const app = express();
 
-// Middleware
+app.use(cors());
+
+// middleware
 app.use(express.json());
 app.use(morgan("dev"));
 
-// Serve static files from the build directory
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-app.use(express.static(path.join(__dirname, "ecom/build")));
+// Serve static files
+const staticFilesPath = path.join(__dirname, "./ecom/build");
+console.log("Static files path:", staticFilesPath);
+app.use(express.static(staticFilesPath));
 
-// Define routes
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/product", productRoutes);
 
-// For any other route, serve the index.html file
-app.get("*", function (req, res) {
-  res.sendFile(path.join(__dirname, "ecom/build/index.html"));
+// Route all other requests to index.html
+app.get("*", (req, res) => {
+  const indexPath = path.join(staticFilesPath, "index.html");
+  console.log("Index HTML path:", indexPath);
+  res.sendFile(indexPath);
 });
 
-// Start the server
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`.bgCyan.white);
 });
