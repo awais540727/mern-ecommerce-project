@@ -6,46 +6,37 @@ import authRoute from "./routes/authRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import path from "path";
-import { dirname } from "path";
 import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Configure environment variables
+// Configure env
 env.config();
 
-// Connect to the database
+// Database connection
 connectDB();
 
-// Create the Express app
+// Create Express app
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(morgan("dev"));
 
-// Serve static files from the 'build' directory
-const staticFilesDir = path.join(__dirname, "ecom", "build");
-app.use(express.static(staticFilesDir));
+// Serve static files from the build directory
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+app.use(express.static(path.join(__dirname, "ecom/build")));
 
-// API routes
+// Define routes
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/product", productRoutes);
 
-// Serve 'index.html' for all other routes
-app.get("*", (req, res) => {
-  res.sendFile(path.join(staticFilesDir, "index.html"), (err) => {
-    if (err) {
-      console.error("Error sending 'index.html':", err);
-      res.status(500).send("Internal Server Error");
-    }
-  });
+// For any other route, serve the index.html file
+app.get("*", function (req, res) {
+  res.sendFile(path.join(__dirname, "ecom/build/index.html"));
 });
 
 // Start the server
-const port = process.env.PORT || 8080;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
